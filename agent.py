@@ -18,11 +18,11 @@ database_content = []
 ExtractTask= """
 ### **AI Agent Task: Scrape rental listing**
 #### **Objective:**
-Scrape all listing available on the inli website [Inli website](https://www.inli.fr/locations/offres/clichy-92110_v:92110?price_min=&price_max=1739&area_min=51&area_max=&room_min=2&room_max=5&bedroom_min=1&bedroom_max=5).
+Scrape all listing available on the inli website [Inli website]({1}).
  - -
 
  ### **Step 1: Open the Website**
-1. Open the webpage https://www.inli.fr/locations/offres/clichy-92110_v:92110?price_min=&price_max=1739&area_min=51&area_max=&room_min=2&room_max=5&bedroom_min=1&bedroom_max=5 
+1. Open the webpage  {1}
     - ensure that this is the exact url is opened.
     - if the exact url is not opened, open the exact url and verify that all query parameters are present.
 2. Wait for the page to load completely before proceeding.
@@ -95,7 +95,6 @@ def createFileSytem():
     return agent_dir
 
 
-
 def getDatabase(path: pathlib.Path) -> list:
     with open(f'{path}/database.json', 'r') as f:
         database_content = json.loads(f.read())
@@ -117,13 +116,17 @@ def save_database(path: pathlib.Path) -> any:
 
 
 async def main():
+
     system_path = createFileSytem()
     agentFs = str(system_path / 'fs')
-
     database_content = getDatabase(system_path)
+    
     llm = ChatGoogle(model="gemini-2.5-pro")
     oldData = json.dumps(database_content)
-    agent = Agent(task=ExtractTask.format(oldData), llm=llm, browser=browser, max_history_items=20, file_system_path=agentFs)
+    task = ExtractTask.format(oldData, os.environ['INLI_URL'])
+
+
+    agent = Agent(task=task, llm=llm, browser=browser, max_history_items=20, file_system_path=agentFs)
 
     try: 
         await agent.run()
