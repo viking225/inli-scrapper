@@ -121,7 +121,7 @@ async def main():
     agentFs = str(system_path / 'fs')
     database_content = getDatabase(system_path)
     
-    llm = ChatGoogle(model="gemini-2.5-pro")
+    llm = ChatGoogle(model="gemini-2.5-flash-preview-09-2025")
     oldData = json.dumps(database_content)
     task = ExtractTask.format(oldData, os.environ['INLI_URL'])
 
