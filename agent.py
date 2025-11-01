@@ -110,6 +110,9 @@ def save_database(path: pathlib.Path) -> any:
 
     database_content.extend(newData)
 
+    with open(f'{path}/new.json', 'w') as f:
+        json.dump(newData, f)
+        
     with open(f'{path}/database.json', 'w') as f:
         json.dump(database_content, f)
         
