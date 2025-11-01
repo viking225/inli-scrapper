@@ -17,7 +17,7 @@ This scraper is designed to be integrated into an n8n pipeline for automated ren
 
 3. Install the required dependencies:
    ```bash
-   pip install -r requirements.txt
+   uv pip install -r pyproject.toml
    ```
 
 4. Set up your environment variables:
@@ -26,6 +26,10 @@ This scraper is designed to be integrated into an n8n pipeline for automated ren
      ```
      GOOGLE_API_KEY=your_google_api_key_here
      ```
+   - Add the url you want to target
+    ```
+    INLI_URL=the_inli_url_w_query_params
+    ```
 
 ## Usage
 
