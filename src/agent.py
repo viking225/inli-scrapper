@@ -8,7 +8,7 @@ import pathlib
 
 browser = Browser(headless=True)
 tools = Tools()
-AGENT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / 'inli_results'
+AGENT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / '../.inli_results'
 
 
 ExtractTask= """
@@ -91,10 +91,26 @@ async def run_extract_task(previousContent: str = ""):
 
     try: 
         await agent.run()
-        result = __get_extract_results(agentFs / '/browseruse_agent_data/new.json')
+        result = __get_extract_results(AGENT_DIR / 'fs' / 'browseruse_agent_data/new.json')
     except Exception as e:
         print(f"Some exception occured while parsing {str(e)}")
     finally :
         shutil.rmtree(agentFs)
         
     return result
+
+
+if __name__ == "__main__":
+    """Testing save of elements"""
+
+    from database import Task, Database
+    SCRIPT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / '../'
+
+    rentals = __get_extract_results(AGENT_DIR / 'fs' / 'browseruse_agent_data/new.json')
+    database = Database(rootPath=SCRIPT_DIR)
+    task = Task()
+    
+    task.rentals = rentals
+    task.status = 'DONE'
+    database.update_task(task=task)    
+

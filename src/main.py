@@ -1,33 +1,62 @@
 from dotenv import load_dotenv
 from typing import Union
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks, Response, status
 import pathlib
 import os
 
-import database
+from database import Task, Database
 import agent
 
 
 load_dotenv()
-SCRIPT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
+SCRIPT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / '../'
 
 
-database.initialize(rootPath=SCRIPT_DIR)
+database = Database(rootPath=SCRIPT_DIR)
 
 app = FastAPI()
 
-@app.post('/task')
-async def create_task():
-    rentals = database.get_rentals()
+async def launch_task(task: Task):
+    rentals = database.get_all_rentals()
     result = await agent.run_extract_task(previousContent=rentals)
-    return {"rentals": result}
+    
+    task.rentals = result
+    task.status = 'DONE'
+    database.update_task(task=task)    
+
+
+
+@app.post('/task', status_code=201)
+def create_task(backgound_task: BackgroundTasks, response: Response):
+    pending = database.get_pending_tasks()
+    
+    if pending is not None:
+        response.status_code = status.HTTP_200_OK
+        return {"task": pending.to_object()}
+         
+    
+    task = Task();
+    
+    print(f"taskid ${task.id}")
+    
+    database.update_task(task=task)
+
+    backgound_task.add_task(launch_task, task)
+    
+    return {"task": task}
 
 @app.get('/task/{task_id}')
-async def get_task(task_id: int):
-    return { "task": {}, "status": 'PENDING'}
+async def get_task(task_id: str, response: Response):
+    try:
+        task = database.get_task(task_id)
+                
+        return { "task": task.to_object() }
+    except NameError as e:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        
 
 
 @app.get("/rentals")
 def get_rentals():
-    rentals = database.get_rentals()
-    return {rentals}
+    rentals = database.get_all_rentals()
+    return {"rentals": rentals}

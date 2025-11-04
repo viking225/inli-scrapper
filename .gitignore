@@ -1,6 +1,6 @@
 .env
 .venv
-inli_results/
+.inli_results/
 *.egg-info/
 **/__pycache__
 .output
