@@ -1,19 +1,15 @@
 from browser_use import Agent, Tools, Browser, ChatGoogle
-from dotenv import load_dotenv
-import asyncio
 import json
-import pathlib
 import os
 import shutil
+import pathlib
 
 
-load_dotenv()
 
 browser = Browser(headless=True)
-
-
 tools = Tools()
-database_content = []
+AGENT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / '../.inli_results'
+
 
 ExtractTask= """
 ### **AI Agent Task: Scrape rental listing**
@@ -74,70 +70,47 @@ Only save the extracted data to new.json when you finish the extraction for all 
 Before saving data, you should validate that its a valid json array
 """
 
-def createFileSytem():
-    SCRIPT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__)))
-    agent_dir = SCRIPT_DIR / 'inli_results'
-    databaseFile = agent_dir / 'database.json'
-    newJsonFile = agent_dir / 'new.json'
-
-    (agent_dir / 'fs').mkdir(exist_ok=True, parents=True)
-
-    if not os.path.exists(databaseFile):
-        with databaseFile.open("w", encoding ="utf-8") as f:
-            f.write('[]')
-
-    if not os.path.exists(newJsonFile):
-        with newJsonFile.open("w", encoding ="utf-8") as f:
-            f.write('[]')
-
-    print(f"Set {databaseFile} and {newJsonFile}")
-
-    return agent_dir
-
-
-def getDatabase(path: pathlib.Path) -> list:
-    with open(f'{path}/database.json', 'r') as f:
-        database_content = json.loads(f.read())
-
-    return database_content
-
-def save_database(path: pathlib.Path) -> any:
+def __get_extract_results(path: str) -> list:
+    with open(path, 'r') as f:
+        new_data = json.loads(f.read())
+    return new_data
     
-    newData = []
+
+
+async def run_extract_task(previousContent: str = ""):
+    """Run the extract task and return new listing
     
-    with open(f'{path}/fs/browseruse_agent_data/new.json', 'r') as f:
-        newData = json.loads(f.read())
-
-    database_content.extend(newData)
-
-    with open(f'{path}/new.json', 'w') as f:
-        json.dump(newData, f)
-        
-    with open(f'{path}/database.json', 'w') as f:
-        json.dump(database_content, f)
-        
-
-
-async def main():
-
-    system_path = createFileSytem()
-    agentFs = str(system_path / 'fs')
-    database_content = getDatabase(system_path)
-    
+    previousStr should be data about previous listing, needed so the bot will forget about them
+    """
     llm = ChatGoogle(model="gemini-2.5-flash-preview-09-2025")
-    oldData = json.dumps(database_content)
-    task = ExtractTask.format(oldData, os.environ['INLI_URL'])
-
+    task = ExtractTask.format(previousContent, os.environ['INLI_URL'])
+    agentFs = str(AGENT_DIR / 'fs')
+    result = []
 
     agent = Agent(task=task, llm=llm, browser=browser, max_history_items=20, file_system_path=agentFs)
 
     try: 
         await agent.run()
-        save_database(system_path)
+        result = __get_extract_results(AGENT_DIR / 'fs' / 'browseruse_agent_data/new.json')
     except Exception as e:
         print(f"Some exception occured while parsing {str(e)}")
     finally :
         shutil.rmtree(agentFs)
+        
+    return result
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    """Testing save of elements"""
+
+    from database import Task, Database
+    SCRIPT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / '../'
+
+    rentals = __get_extract_results(AGENT_DIR / 'fs' / 'browseruse_agent_data/new.json')
+    database = Database(rootPath=SCRIPT_DIR)
+    task = Task()
+    
+    task.rentals = rentals
+    task.status = 'DONE'
+    database.update_task(task=task)    
+
