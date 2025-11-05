@@ -15,12 +15,14 @@ This scraper is designed to be integrated into an n8n pipeline for automated ren
 
 2. Ensure you have Python 3.11 or higher installed.
 
-3. Install the required dependencies:
+3. Ensure you have uv installed
+
+4. Install the required dependencies:
    ```bash
-   uv pip install -r pyproject.toml
+   uv sync
    ```
 
-4. Set up your environment variables:
+5. Set up your environment variables:
    - Create a `.env` file in the project root
    - Add your Google API key for the ChatGoogle LLM:
      ```
@@ -33,10 +35,10 @@ This scraper is designed to be integrated into an n8n pipeline for automated ren
 
 ## Usage
 
-Run the scraper using the following command:
+Run the application using the following command:
 
 ```bash
-python agent.py
+uv run fastapi run src/main.py --no-reload --port 8000
 ```
 
 The script will:
