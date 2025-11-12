@@ -45,7 +45,6 @@ class Database:
         for id in tasks:
             documents[id] = tasks[id].to_object()
         
-        print('CALL THERE')
         print(documents)
         
         with open(self.databaseFile, 'w') as f:
