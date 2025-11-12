@@ -3,6 +3,7 @@ services:
     image: scrapper/inli
     build: .
     restart: always
+    container_name: scrapper-api
     environment:
       - PORT=9005
     healthcheck:
