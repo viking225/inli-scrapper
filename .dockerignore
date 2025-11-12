@@ -1,0 +1,5 @@
+docker-compose.yml
+.output
+.venv
+.gitignore
+Readme.md

@@ -6,9 +6,9 @@ WORKDIR /opt/app
 RUN pip install uv
 RUN python -m venv .venv
 COPY . .
+RUN chmod +x /opt/app/start.sh
 RUN uv sync
 
 
-CMD ["uv", "run", "fastapi", "run", "src/main.py", "--no-reload", "--port", "8000"]
-
+ENTRYPOINT [ "/opt/app/start.sh" ]
 

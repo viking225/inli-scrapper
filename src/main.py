@@ -60,3 +60,7 @@ async def get_task(task_id: str, response: Response):
 def get_rentals():
     rentals = database.get_all_rentals()
     return {"rentals": rentals}
+
+@app.get('/health')
+def get_health(): 
+    return { "status": "ok"}

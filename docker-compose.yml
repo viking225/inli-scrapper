@@ -2,3 +2,12 @@ services:
   scrapper-api:
     image: scrapper/inli
     build: .
+    restart: always
+    environment:
+      - PORT=9005
+    healthcheck:
+      test: curl --fail -s http://localhost:$$PORT/health | grep -Eo '\"status\":\"ok\"' || exit 1
+      start_period: 60s
+      interval: 30s
+      timeout: 10s
+      retries: 3
