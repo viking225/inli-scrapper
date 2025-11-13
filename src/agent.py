@@ -95,6 +95,7 @@ async def run_extract_task(previousContent: str = ""):
     except Exception as e:
         print(f"Some exception occured while parsing {str(e)}")
     finally :
+        await browser.stop()
         shutil.rmtree(agentFs)
         
     return result
