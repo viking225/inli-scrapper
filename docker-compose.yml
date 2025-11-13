@@ -1,3 +1,6 @@
+volumes:
+  db-data:
+    
 services:
   scrapper-api:
     image: scrapper/inli
@@ -6,9 +9,11 @@ services:
     container_name: scrapper-api
     environment:
       - PORT=9005
+    volumes:
+      - db-data:/opt/app/src/.output/
     healthcheck:
       test: curl --fail -s http://localhost:$$PORT/health | grep -Eo '\"status\":\"ok\"' || exit 1
       start_period: 60s
-      interval: 30s
+      interval: 300s
       timeout: 10s
       retries: 3

@@ -10,7 +10,10 @@ class Task:
     status: str
     rentals: list
     
-    def __init__(self, id= str(int(time.time() * 1000000)), status='PENDING', rentals=[]):
+    def __init__(self, id=None, status='PENDING', rentals=[]):
+        if id is None:
+            id=str(int(time.time() * 1000000))
+        
         self.id = id
         self.status = status
         self.rentals = rentals
