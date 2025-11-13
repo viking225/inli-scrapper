@@ -6,7 +6,6 @@ import pathlib
 
 
 
-browser = Browser(headless=True)
 tools = Tools()
 AGENT_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))) / '../.inli_results'
 
@@ -82,6 +81,7 @@ async def run_extract_task(previousContent: str = ""):
     
     previousStr should be data about previous listing, needed so the bot will forget about them
     """
+    browser = Browser(headless=True)
     llm = ChatGoogle(model="gemini-2.5-flash-preview-09-2025")
     task = ExtractTask.format(previousContent, os.environ['INLI_URL'])
     agentFs = str(AGENT_DIR / 'fs')
