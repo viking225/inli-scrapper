@@ -10,7 +10,7 @@ services:
     environment:
       - PORT=9005
     volumes:
-      - db-data:/opt/app/src/.output/
+      - db-data:/opt/app/.output/
     healthcheck:
       test: curl --fail -s http://localhost:$$PORT/health | grep -Eo '\"status\":\"ok\"' || exit 1
       start_period: 60s
