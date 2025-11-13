@@ -36,8 +36,8 @@ class Database:
         if not os.path.exists(databaseFile):
             with databaseFile.open("w", encoding ="utf-8") as f:
                 f.write('{}')
+            print(f"{databaseFile} was initialized")
 
-        print(f"{databaseFile} was initialized")
         self.databaseFile = databaseFile
         
 
