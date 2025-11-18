@@ -9,6 +9,8 @@ services:
     container_name: scrapper-api
     environment:
       - PORT=9005
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - INLI_URL=${INLI_URL}
     volumes:
       - db-data:/opt/app/.output/
     healthcheck:

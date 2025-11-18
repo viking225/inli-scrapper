@@ -1,5 +1,6 @@
 docker-compose.yml
 .output
 .venv
+.env
 .gitignore
 Readme.md
