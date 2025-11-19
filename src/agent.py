@@ -19,6 +19,7 @@ Scrape all listing available on the inli website [Inli website]({1}).
  ### **Step 1: Open the Website**
 1. Open the webpage  {1}
     - ensure that this is the exact url is opened.
+    - ensure that query parameters in the provided url are used when visiting the webpage
     - if the exact url is not opened, open the exact url and verify that all query parameters are present.
 2. Wait for the page to load completely before proceeding.
 3. Validate any cookie window.
@@ -94,6 +95,7 @@ async def run_extract_task(previousContent: str = ""):
         result = __get_extract_results(AGENT_DIR / 'fs' / 'browseruse_agent_data/new.json')
     except Exception as e:
         print(f"Some exception occured while parsing {str(e)}")
+        raise
     finally :
         await browser.stop()
         shutil.rmtree(agentFs)

@@ -18,10 +18,15 @@ app = FastAPI()
 
 async def launch_task(task: Task):
     rentals = database.get_all_rentals()
-    result = await agent.run_extract_task(previousContent=rentals)
     
-    task.rentals = result
-    task.status = 'DONE'
+    try:
+        result = await agent.run_extract_task(previousContent=rentals)
+        task.rentals = result
+        task.status = 'DONE'
+    except Exception as e:
+        task.status = 'FAILED'
+
+    print('Task: ', task.to_object)
     database.update_task(task=task)    
 
 
